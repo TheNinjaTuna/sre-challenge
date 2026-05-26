@@ -1,14 +1,16 @@
 [Unit]
-Description=Flask Application
+Description=Warpnet Flask App
 After=network.target
 
 [Service]
-User=www-data
-WorkingDirectory=/opt/myapp
+User=flaskapp
+Group=flaskapp
 
-Environment="API_KEY={{ api_key }}"
+WorkingDirectory=/opt/flaskapp/sre-challenge/app
 
-ExecStart=/usr/bin/flask --app application run --host=0.0.0.0
+Environment="APP_SECRET={{ APP_SECRET }}"
+
+ExecStart=/opt/flaskapp/venv/bin/flask --app application run --host=0.0.0.0 --port=5000
 
 Restart=always
 RestartSec=3
