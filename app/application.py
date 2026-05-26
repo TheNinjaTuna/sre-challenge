@@ -1,9 +1,14 @@
 import sqlite3
 import logging
 from flask import Flask, session, redirect, url_for, request, render_template, abort
+from argon2 import PasswordHasher
 
 
 app = Flask(__name__)
+
+ph = PasswordHasher()
+
+# TODO: Replace w/ secret
 app.secret_key = b"192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf"
 app.logger.setLevel(logging.INFO)
 
@@ -22,16 +27,19 @@ def is_authenticated():
 
 def authenticate(username, password):
     connection = get_db_connection()
-    users = connection.execute("SELECT * FROM users").fetchall()
+    user = connection.execute(f"SELECT * FROM users WHERE username = '{ username }'").fetchone()
     connection.close()
 
-    for user in users:
-        if user["username"] == username and user["password"] == password:
-            app.logger.info(f"the user '{username}' logged in successfully with password '{password}'")
-            session["username"] = username
-            return True
+    if user ==  None:
+        app.logger.warning(f"A user tried logging in with the username { username } but no record was found.")
+        abort(401)
 
-    app.logger.warning(f"the user '{ username }' failed to log in '{ password }'")
+    if user["username"] == username and ph.verify(user["password"], password):
+        app.logger.info(f"the user '{username}' logged in successfully with password.")
+        session["username"] = username
+        return True
+
+    app.logger.warning(f"the user '{ username }' failed to log in.")
     abort(401)
 
 
