@@ -1,0 +1,53 @@
+---
+- name: Configure Warpnet SRE Flask app
+  hosts: all
+  become: yes
+  become_user: root
+
+  vars_prompt:
+    - name: api_key
+      prompt: What is your flask app secret?
+      private: true
+
+  tasks:
+    - name: Install pip
+      apt:
+        pkg:
+          - python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Create app dir
+      file:
+        path: /opt/flaskapp
+        state: directory
+        owner: flaskapp
+        group: flaskapp
+        mode: "0755"
+
+    - name: Clone app remote repo
+      git:
+        repo: "https://github.com/TheNinjaTuna/sre-challenge"
+        dest: /opt/flaskapp
+        version: main
+
+    - name: Install pip requirements
+      pip:
+        requirements: /opt/flaskapp/sre-challenge/app/requirements.txt
+
+    - name: Create systemd service
+      template:
+        src: flaskapp.service.j2
+        dest: /etc/systemd/system/flaskapp.service
+      notify:
+        - Reload systemd
+        - Restart flaskapp
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: true
+
+    - name: Restart flaskapp
+      systemd:
+        name: flaskapp
+        state: restarted

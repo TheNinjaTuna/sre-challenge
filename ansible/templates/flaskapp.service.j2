@@ -1,0 +1,17 @@
+[Unit]
+Description=Flask Application
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/opt/myapp
+
+Environment="API_KEY={{ api_key }}"
+
+ExecStart=/usr/bin/flask --app application run --host=0.0.0.0
+
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
