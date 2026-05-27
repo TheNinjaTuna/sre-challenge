@@ -5,6 +5,7 @@ namespace: warpnet-sre-challenge
 resources:
   - deployment.yaml
   - service.yaml
+  - pv.yaml
   - pvc.yaml
   - ingress.yaml
   - namespace.yaml
