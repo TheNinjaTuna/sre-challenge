@@ -9,14 +9,16 @@ app = Flask(__name__)
 
 ph = PasswordHasher()
 
-app.secret_key = os.getenv("APP_SECRET").encode()
+#app.secret_key = os.getenv("APP_SECRET").encode()
+app.secret_key = b"192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf"
 app.logger.setLevel(logging.INFO)
 
 
 def get_db_connection():
     connection = sqlite3.connect("database.db")
     connection.row_factory = sqlite3.Row
-    return connection
+    cursor = connection.cursor()
+    return cursor
 
 
 def is_authenticated():
@@ -26,9 +28,9 @@ def is_authenticated():
 
 
 def authenticate(username, password):
-    connection = get_db_connection()
-    user = connection.execute(f"SELECT * FROM users WHERE username = '{ username }'").fetchone()
-    connection.close()
+    cursor = get_db_connection()
+    user = cursor.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+    cursor.close()
 
     if user ==  None:
         app.logger.warning(f"A user tried logging in with the username { username } but no record was found.")

@@ -1,6 +1,7 @@
 ---
 - name: Configure Warpnet SRE Flask app
   hosts: all
+  remote_user: serveradmin
   become: true
 
   vars_prompt:
@@ -42,15 +43,12 @@
       file:
         path: /opt/flaskapp
         state: directory
-        owner: flaskapp
-        group: flaskapp
         mode: "0755"
 
     - name: Clone application repository
       git:
         repo: "https://github.com/TheNinjaTuna/sre-challenge"
         dest: /opt/flaskapp
-        version: main
 
     - name: Set ownership on app directory
       file:
@@ -66,7 +64,7 @@
 
     - name: Install Python requirements into venv
       pip:
-        requirements: /opt/flaskapp/sre-challenge/app/requirements.txt
+        requirements: /opt/flaskapp/app/requirements.txt
         virtualenv: /opt/flaskapp/venv
 
     - name: Create systemd service
