@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flaskapp-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: flaskapp.snowy
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flask-app-service
+                port:
+                  number: 80

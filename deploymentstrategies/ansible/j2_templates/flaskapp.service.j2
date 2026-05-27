@@ -10,7 +10,7 @@ WorkingDirectory=/opt/flaskapp/app
 
 Environment="APP_SECRET={{ APP_SECRET }}"
 
-ExecStart=/opt/flaskapp/venv/bin/gunicorn -w 2 -b 0.0.0.0:5000 application:app
+ExecStart=/opt/flaskapp/venv/bin/gunicorn -w 2 -b 0.0.0.0:5000 --access-logfile - --error-logfile - --log-level warning application:app
 
 Restart=always
 RestartSec=3

@@ -3,19 +3,32 @@ import os
 import logging
 from flask import Flask, session, redirect, url_for, request, render_template, abort
 from argon2 import PasswordHasher
-
+import shutil
 
 app = Flask(__name__)
 
+DB_PATH = os.environ["SQLITE_DB_PATH"]
+SEED_DB_PATH = "/app/database.db"  
+
+def ensure_db_exists():
+    if not os.path.exists(DB_PATH):
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        shutil.copyfile(SEED_DB_PATH, DB_PATH)
+        print("Seed database copied to persistent volume")
+    else:
+        print("Database already exists, skipping seed")
+
+ensure_db_exists()
+
 ph = PasswordHasher()
 
-#app.secret_key = os.getenv("APP_SECRET").encode()
-app.secret_key = b"192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf"
+app.secret_key = os.getenv("APP_SECRET").encode()
+#app.secret_key = b"192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf"
 app.logger.setLevel(logging.INFO)
 
 
 def get_db_connection():
-    connection = sqlite3.connect("database.db")
+    connection = sqlite3.connect(DB_PATH)
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
     return cursor
