@@ -9,6 +9,7 @@ Group=flaskapp
 WorkingDirectory=/opt/flaskapp/app
 
 Environment="APP_SECRET={{ APP_SECRET }}"
+Environment="SQLITE_DB_PATH=/var/lib/flaskapp/database.db"
 
 ExecStart=/opt/flaskapp/venv/bin/gunicorn -w 2 -b 0.0.0.0:5000 --access-logfile - --error-logfile - --log-level warning application:app
 
