@@ -23,7 +23,6 @@ ensure_db_exists()
 ph = PasswordHasher()
 
 app.secret_key = os.getenv("APP_SECRET").encode()
-#app.secret_key = b"192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf"
 app.logger.setLevel(logging.INFO)
 
 
