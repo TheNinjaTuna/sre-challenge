@@ -1,5 +1,5 @@
 # Warpnet SRE Challenge submission
-This git repo contains my submission for the Warpnet SRE challenge. The goal of this challenge was to fix and deploy a provided flask app while keeping the following principles in mind:
+This git repo contains my submission for the [Warpnet SRE challenge](https://github.com/warpnet/sre-challenge). The goal of this challenge was to fix and deploy a provided flask app while keeping the following principles in mind:
 
 - Functionality
 - Simplicity
@@ -9,7 +9,7 @@ This git repo contains my submission for the Warpnet SRE challenge. The goal of 
 - Observability
 - Security
 
-Deployment needed to be arranged via two methods: deployment to a VM and to a Kubernetes cluster. The methods I have chosen will be further outlined down below.
+Deployment needed to be possible via two methods: deployment to a VM and to a Kubernetes cluster. The methods I have chosen will be further outlined down below.
 
 ## Changes to the app
 The following changes were made to the app:
@@ -21,8 +21,8 @@ The following changes were made to the app:
 - Added indexing to the username column in the users table of the DB. This is considered a best practice and speeds up DB queries when looking through a large number of records.
 - Implemented prepared statements when querying the database in order to sanitize user input.
 - Removed passwords from app logging.
-- Removed the hardcoded flask secret in favor of an enviroment variable, this enables the usage of secret management.
-- Ensured DB persistence for all deployment methods. The pre-packed database is now copied to a predefined location (also defined by an enviroment variable). This is not done in case the DB is already present.
+- Removed the hardcoded flask secret in favor of an environment variable, this enables the usage of secret management.
+- Ensured DB persistence for all deployment methods. The pre-packed database is now copied to a predefined location (also defined by an environment variable). This is not done in case the DB is already present.
 
 ### Container image
 A container image has been constructed using the dockerfile included in this project. It can be found on https://hub.docker.com/repository/docker/theninjatuna/warpnet-sre-challenge, and pulled from docker.io under theninjatuna/warpnet-sre-challenge:latest
@@ -70,7 +70,7 @@ The playbook will then:
 - Create a directory for the persistent database in /var/lib/flaskapp
 - Install the required python dependencies in a new virtual enviroment
 - Create a systemd service based on the j2 template, called flaskapp
-    - This systemd service executes the flaskapp via gunicorn with two parralel workers
+    - This systemd service executes the flaskapp via gunicorn with two parallel workers
 - Ensure the systemd service is started
 
 
@@ -86,9 +86,9 @@ To do deploy the app, run this command in the folder with compose.yaml:
 ### Some small notes
 Running the app with multiple gunicorn workers (and thus app instances) can potentially be dangerous because we're using a SQLite database. As far as I'm aware this is mainly an issue when writes to the database happen, which this app doesn't do. Yet this should still be taken into account.
 
-I'd also recommend the usage of a more conventient secret manager (like ansible-vault) for the ansible deployment strategy, though prompting the user seemed like an easy enough alround solution.
+I'd also recommend the usage of a more convenient secret manager (like ansible-vault) for the ansible deployment strategy, though prompting the user seemed like an easy enough alround solution.
 
-### About my enviroment
+### About my environment
 The virtual machine I used when testing my playbook is a Ubuntu LTS 22.04 machine hosted on my own Proxmox server.
 
 ## Deployment to a cluster
@@ -96,16 +96,16 @@ For deploying the app to a cluster I chose to prepare a kustomize yaml, with all
 
 To deploy the app on your cluster, download all the contents of the /deploymentstrategies/k8s folder into a folder of your choosing on a machine with kubectl installed and configured.
 
-Before running the deployment command, it should be noted that the ingress resource present in this project is meant for the NGINX ingress controller, which I have running in my enviroment. Though it can easily be edited or subsituted for your own prefered method of ingress control. It points to "flaskapp.snowy", with snowy being my internal homelab TLD.
+Before running the deployment command, it should be noted that the ingress resource present in this project is meant for the NGINX ingress controller, which I have running in my environment. Though it can easily be edited or substituted for your own preferred method of ingress control. It points to "flaskapp.snowy", with snowy being my internal homelab TLD.
 
-Once you have ommited, subsituted or edited the file, run the command:
+Once you have omitted, substituted or edited the file, run the command:
 ``kubectl apply -k {folder with contents of /deploymentstrategies/k8s}``
 
 A new namespace called "warpnet-sre-challenge" will be created, along with a deployment, service, persistent volume, persistent volume claim, secret, and ingress.
 
 After all the resources have been created, your service should be reachable via the host you specified in your ingress file. Make sure a DNS entry exists pointing to the host running your cluster ingress.
 
-### About my enviroment
+### About my environment
 My test deployment was made on my homelab Kubernetes cluster, which consists of three virtualized nodes (ran on a Proxmox server). I use an external DNS server (dnsmasq) and reverse proxy (Caddy) which I use to route the traffic to my cluster. 
 
-I deployed it using ArgoCD, while pointing it at this GitHub repository. It will find the k8s folder and corresponding kustomize file.
+I deployed it using ArgoCD, while pointing it at this GitHub repository. It will find the k8s folder and corresponding kustomize file, yet deployment of the ingress might fail if you use a different ingress controller.
