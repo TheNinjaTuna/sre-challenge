@@ -58,20 +58,20 @@
         state: directory
         mode: "0755"
 
-    - name: Check if persistent database already exists
-      stat:
-        path: /var/lib/flaskapp/database.db
-      register: flaskapp_db
+    # - name: Check if persistent database already exists
+    #   stat:
+    #     path: /var/lib/flaskapp/database.db
+    #   register: flaskapp_db
 
-    - name: Copy initial database if missing
-      copy:
-        src: /opt/flaskapp/app/database.db
-        dest: /var/lib/flaskapp/database.db
-        remote_src: true
-        owner: flaskapp
-        group: flaskapp
-        mode: "0644"
-      when: not flaskapp_db.stat.exists
+    # - name: Copy initial database if missing
+    #   copy:
+    #     src: /opt/flaskapp/app/database.db
+    #     dest: /var/lib/flaskapp/database.db
+    #     remote_src: true
+    #     owner: flaskapp
+    #     group: flaskapp
+    #     mode: "0644"
+    #   when: not flaskapp_db.stat.exists
 
     - name: Set ownership on app directory
       file:

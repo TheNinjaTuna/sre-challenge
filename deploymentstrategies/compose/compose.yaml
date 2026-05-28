@@ -6,11 +6,15 @@ services:
     image: theninjatuna/warpnet-sre-challenge:latest
     container_name: flaskapp
 
+    
+    restart: unless-stopped
+
     ports:
       - "5000:5000"
 
     environment:
       - SQLITE_DB_PATH=/data/app.db
+      - APP_SECRET=${APP_SECRET}
       - PYTHONUNBUFFERED=1
 
     volumes:
