@@ -24,6 +24,8 @@ The following changes were made to the app:
 - Removed the hardcoded flask secret in favor of an environment variable, this enables the usage of secret management.
 - Ensured DB persistence for all deployment methods. The pre-packed database is now copied to a predefined location (also defined by an environment variable). This is not done in case the DB is already present.
 
+Switching out the SQLite database for a more multi-user and production friendly one (like PostgreSQL) was taken into consideration but ultimately decided to be out of scope.
+
 ### Container image
 A container image has been constructed using the dockerfile included in this project. It can be found on https://hub.docker.com/repository/docker/theninjatuna/warpnet-sre-challenge, and pulled from docker.io under theninjatuna/warpnet-sre-challenge:latest
 
@@ -73,7 +75,6 @@ The playbook will then:
     - This systemd service executes the flaskapp via gunicorn with two parallel workers
 - Ensure the systemd service is started
 
-
 ### Alternate installation method
 Alternatively, the app can also easily be installed on a machine with the docker engine and docker compose installed.
 
@@ -106,6 +107,6 @@ A new namespace called "warpnet-sre-challenge" will be created, along with a dep
 After all the resources have been created, your service should be reachable via the host you specified in your ingress file. Make sure a DNS entry exists pointing to the host running your cluster ingress.
 
 ### About my environment
-My test deployment was made on my homelab Kubernetes cluster, which consists of three virtualized nodes (ran on a Proxmox server). I use an external DNS server (dnsmasq) and reverse proxy (Caddy) which I use to route the traffic to my cluster. 
+My test deployment was made on my homelab Kubernetes cluster, which consists of three virtualized nodes (ran on a Proxmox server). I use an external DNS server (dnsmasq) and reverse proxy (Caddy) which I use to route the traffic to my cluster and individual apps.
 
 I deployed it using ArgoCD, while pointing it at this GitHub repository. It will find the k8s folder and corresponding kustomize file, yet deployment of the ingress might fail if you use a different ingress controller.
